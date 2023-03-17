@@ -1,12 +1,32 @@
 import React, { useState } from 'react';
+import {
+  getJetCharterL2Instance,
+  getWireTransferTokenL2Instance,
+  getL2GatewayInstance,
+  getSigner,
+  toWei,
+} from './contracts';
 
-const JetBookingForm = () => {
+const JetBookingForm = ({ jets }) => {
   const [selectedJet, setSelectedJet] = useState(null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle jet booking and payment using web3.js or ethers.js
-    // You'll need to interact with your smart contracts
+    if (!selectedJet) return;
+
+    const jet = jets.find((j) => j.id === parseInt(selectedJet));
+    if (!jet) return;
+
+    const signer = await getSigner();
+    const wireTransferTokenL2Instance = await getWireTransferTokenL2Instance();
+    const l2GatewayInstance = await getL2GatewayInstance();
+
+    // Approve L2 Gateway to transfer tokens for the booking
+    const approvalAmount = toWei(jet.price);
+    await wireTransferTokenL2Instance.connect(signer).approve(l2GatewayInstance.address, approvalAmount);
+
+    // Initiate the withdrawal for the booking
+    await l2GatewayInstance.connect(signer).initiateWithdrawal(approvalAmount);
   };
 
   return (
@@ -15,13 +35,4 @@ const JetBookingForm = () => {
       <form onSubmit={handleSubmit}>
         <label htmlFor="jet">Select a Jet:</label>
         <select id="jet" onChange={(e) => setSelectedJet(e.target.value)}>
-          <option value="">--Please choose a jet--</option>
-          {/* Populate the options with jet data from your state */}
-        </select>
-        <button type="submit">Book</button>
-      </form>
-    </div>
-  );
-};
-
-export default JetBookingForm;
+          <option value="">--Please choose a
