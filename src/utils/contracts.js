@@ -46,10 +46,20 @@ const getL2GatewayInstance = async () => {
   return l2GatewayInstance;
 };
 
+const toEther = (wei) => {
+  return ethers.utils.formatEther(wei);
+};
+
+const toWei = (ether) => {
+  return ethers.utils.parseEther(ether);
+};
+
 export {
   getProvider,
   getSigner,
   getJetCharterL2Instance,
   getWireTransferTokenL2Instance,
   getL2GatewayInstance,
+  toEther,
+  toWei,
 };
