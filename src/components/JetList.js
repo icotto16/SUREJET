@@ -1,20 +1,36 @@
 import React, { useState, useEffect } from 'react';
+import { getJetCharterL2Instance, toEther } from './contracts';
 
 const JetList = () => {
   const [jets, setJets] = useState([]);
 
   useEffect(() => {
-    // Fetch jet data from your smart contract and set the jets state
-    // You'll need to use web3.js or ethers.js to interact with your smart contracts
+    const fetchJetData = async () => {
+      const jetCharterL2Instance = await getJetCharterL2Instance();
+      const totalJets = await jetCharterL2Instance.totalSupply();
+
+      let jetList = [];
+      for (let i = 1; i <= totalJets; i++) {
+        const charterData = await jetCharterL2Instance.charterData(i);
+        jetList.push({
+          id: i,
+          ...charterData,
+          price: toEther(charterData.price),
+        });
+      }
+      setJets(jetList);
+    };
+
+    fetchJetData();
   }, []);
 
   return (
     <div>
       <h3>Available Jets</h3>
       <ul>
-        {jets.map((jet, index) => (
-          <li key={index}>
-            {jet.name} - {jet.capacity} passengers - ${jet.price}
+        {jets.map((jet) => (
+          <li key={jet.id}>
+            {jet.departureLocation} - {jet.arrivalLocation} - {jet.departureTime} - {jet.price} ETH
           </li>
         ))}
       </ul>
