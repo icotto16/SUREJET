@@ -1,16 +1,13 @@
 import React from 'react';
 import './App.css';
-import WertNFTWidget from './components/WertNFTWidget';
+import HomePage from './pages/HomePage';
 
-const App = () => {
-  const apiKey = 'your-wert-api-key';
-
+function App() {
   return (
     <div className="App">
-      <h1>Wert NFT Module Widget</h1>
-      <WertNFTWidget apiKey={apiKey} />
+      <HomePage />
     </div>
   );
-};
+}
 
 export default App;
